@@ -92,6 +92,7 @@
         INSERT INTO pembayaran (no_kuitansi, tanggal, jumlah, ke, pesanan_id, status_pembayaran)
         VALUES ('KWI001', '2023-03-03', 200000, 1, 1);
 
+
 2.	Buatlah Stored Procedure dengan nama kurangi_stok untuk mengurangi stok produk. Stok berkurang sesuai dengan jumlah pesanan produk.
     DELIMITER $$
     CREATE PROCEDURE kurangi_stok(IN produk_id INT, IN jumlah_pesanan INT)
@@ -114,3 +115,23 @@
     UPDATE produk SET stok = stok_produk WHERE id = produk_id;
     END $$
     DELIMITER ;
+
+
+3.	Buatlah Trigger dengan nama trig_kurangi_stok yang akan mengurangi stok produk jika terjadi transaksi pesanan oleh pelanggan (memanggil stored procedure kurangi_stok soal no 1).
+Trigger ini aktif setelah trigger after_pesanan_items_insert (trigger pada contoh 3).
+    CREATE TRIGGER ...
+    DELIMITER $$
+    CREATE TRIGGER trig_kurangi_stok AFTER INSERT ON pesanan_items
+    FOR EACH ROW
+    BEGIN
+    -- Memanggil stored procedure kurangi_stok untuk mengurangi stok produk
+    CALL kurangi_stok(NEW.produk_id, NEW.qty);
+    END $$
+    DELIMITER ;
+
+    SELECT * FROM `produk`
+
+    INSERT INTO pesanan_items (produk_id, pesanan_id, qty, harga) VALUES 
+    (7, 3, 2, 7000)
+
+    SELECT * FROM `produk`
